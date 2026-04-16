@@ -1,0 +1,148 @@
+﻿# ============================================================
+# SINGLE PASS MACRO PROCESSOR (PYTHON)
+# ============================================================
+
+
+# ---------------- HOW TO RUN THIS PROGRAM ----------------
+# 1. Open Terminal (Ubuntu / Linux / Mac / Windows PowerShell)
+#
+# 2. Create this Python file:
+#    nano macro.py
+#
+# 3. Paste this entire code and save:
+#    Press CTRL + O → Enter → CTRL + X
+#
+# 4. Create input file:
+#    nano input.txt
+#
+# 5. Paste the following input:
+#
+#    MACRO
+#    INCR A
+#    ADD A, ONE
+#    SUB A, TWO
+#    MEND
+#    START 100
+#    INCR DATA
+#    END
+#
+# 6. Save input file:
+#    CTRL + O → Enter → CTRL + X
+#
+# 7. Run the program:
+#    python3 macro.py
+#
+# 8. Make sure BOTH files are in SAME folder:
+#    macro.py and input.txt
+#
+# --------------------------------------------------------
+
+
+# ---------------- EXPECTED OUTPUT ----------------
+# --- MACRO NAME TABLE (MNT) ---
+# Index   Macro Name     MDT Index
+# 0       INCR           0
+#
+# --- MACRO DEFINITION TABLE (MDT) ---
+# 0       INCR A
+# 1       ADD A, ONE
+# 2       SUB A, TWO
+# 3       MEND
+# ------------------------------------------------
+
+
+# ============================================================
+# ACTUAL CODE STARTS HERE
+# ============================================================
+
+
+# Macro Name Table
+MNT = []
+
+
+# Macro Definition Table
+MDT = []
+
+
+def single_pass_macro_processor(filename):
+    mdt_index = 0
+
+
+    # Open input file in read mode
+    with open(filename, "r") as file:
+        lines = file.readlines()
+
+
+    i = 0
+
+
+    # Loop through all lines
+    while i < len(lines):
+        line = lines[i].strip()
+
+
+        # Check if MACRO definition starts
+        if line == "MACRO":
+            i += 1
+
+
+            # Read macro header
+            header = lines[i].strip()
+            macro_name = header.split()[0]
+
+
+            # Store macro name with MDT index in MNT
+            MNT.append((macro_name, mdt_index))
+
+
+            # Store header in MDT
+            MDT.append(header)
+            mdt_index += 1
+
+
+            i += 1
+
+
+            # Read macro body until MEND
+            while lines[i].strip() != "MEND":
+                MDT.append(lines[i].strip())
+                mdt_index += 1
+                i += 1
+
+
+            # Store MEND
+            MDT.append("MEND")
+            mdt_index += 1
+            i += 1
+
+
+        else:
+            i += 1
+
+
+
+
+# Call the macro processor function
+single_pass_macro_processor("input.txt")
+
+
+
+
+# ---------------- DISPLAY OUTPUT ----------------
+
+
+# Print Macro Name Table
+print("\n--- MACRO NAME TABLE (MNT) ---")
+print("Index\tMacro Name\tMDT Index")
+
+
+for index, (name, mdt_ptr) in enumerate(MNT):
+    print(f"{index}\t{name}\t\t{mdt_ptr}")
+
+
+# Print Macro Definition Table
+print("\n--- MACRO DEFINITION TABLE (MDT) ---")
+
+
+for index, line in enumerate(MDT):
+    print(f"{index}\t{line}")

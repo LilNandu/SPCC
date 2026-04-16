@@ -1,0 +1,208 @@
+﻿#include<stdio.h>
+#include<ctype.h>
+#include<string.h>
+
+
+int n;
+char prod[10][10];
+char first[10][10], follow[10][10];
+
+
+// Add element to set (avoid duplicates)
+void add(char *set, char val) {
+    if(strchr(set, val) == NULL) {
+        int len = strlen(set);
+        set[len] = val;
+        set[len+1] = '\0';
+    }
+}
+
+
+// FIRST function
+void findFirst(char c, int index) {
+    if(!isupper(c)) {
+        add(first[index], c);
+        return;
+    }
+
+
+    for(int i=0; i<n; i++) {
+        if(prod[i][0] == c) {
+            if(prod[i][2] == '#') {
+                add(first[index], '#');
+            } else {
+                findFirst(prod[i][2], index);
+            }
+        }
+    }
+}
+
+
+// FOLLOW function
+void findFollow(char c, int index) {
+    if(c == prod[0][0]) {
+        add(follow[index], '$');
+    }
+
+
+    for(int i=0; i<n; i++) {
+        for(int j=2; prod[i][j] != '\0'; j++) {
+
+
+            if(prod[i][j] == c) {
+
+
+                // Case 1: Next symbol exists
+                if(prod[i][j+1] != '\0') {
+
+
+                    // If terminal
+                    if(!isupper(prod[i][j+1])) {
+                        add(follow[index], prod[i][j+1]);
+                    }
+
+
+                    // If non-terminal
+                    else {
+                        int nextIndex = prod[i][j+1] - 'A';
+
+
+                        for(int k=0; first[nextIndex][k] != '\0'; k++) {
+                            if(first[nextIndex][k] != '#')
+                                add(follow[index], first[nextIndex][k]);
+                        }
+                    }
+                }
+
+
+                // Case 2: Last symbol
+                else {
+                    if(prod[i][0] != c) {
+                        int lhsIndex = prod[i][0] - 'A';
+
+
+                        for(int k=0; follow[lhsIndex][k] != '\0'; k++) {
+                            add(follow[index], follow[lhsIndex][k]);
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+int main() {
+    printf("Enter number of productions: ");
+    scanf("%d", &n);
+
+
+    printf("Enter productions (Example: S=AB):\n");
+    for(int i=0; i<n; i++) {
+        scanf("%s", prod[i]);
+    }
+
+
+    // Initialize sets
+    for(int i=0; i<10; i++) {
+        first[i][0] = '\0';
+        follow[i][0] = '\0';
+    }
+
+
+    // FIRST calculation
+    for(int i=0; i<n; i++) {
+        findFirst(prod[i][0], prod[i][0]-'A');
+    }
+
+
+    // FOLLOW calculation
+    for(int i=0; i<n; i++) {
+        findFollow(prod[i][0], prod[i][0]-'A');
+    }
+
+
+    printf("\nFIRST Sets:\n");
+    for(int i=0; i<n; i++) {
+        char c = prod[i][0];
+        printf("FIRST(%c) = { ", c);
+
+
+        for(int j=0; first[c-'A'][j] != '\0'; j++)
+            printf("%c ", first[c-'A'][j]);
+
+
+        printf("}\n");
+    }
+
+
+    printf("\nFOLLOW Sets:\n");
+    for(int i=0; i<n; i++) {
+        char c = prod[i][0];
+        printf("FOLLOW(%c) = { ", c);
+
+
+        for(int j=0; follow[c-'A'][j] != '\0'; j++)
+            printf("%c ", follow[c-'A'][j]);
+
+
+        printf("}\n");
+    }
+
+
+    return 0;
+}
+
+
+/*
+================= HOW TO RUN THIS CODE IN UBUNTU =================
+
+
+Step 1: Open Terminal
+
+
+Step 2: Open any text editor (nano / gedit / vim)
+Example using nano:
+    nano first_follow.c
+
+
+Step 3: Paste this code into the file
+
+
+Step 4: Save and exit
+    Press CTRL + O → Enter
+    Press CTRL + X
+
+
+Step 5: Compile the program using GCC
+    gcc first_follow.c -o first_follow
+
+
+Step 6: Run the program
+    ./first_follow
+
+
+Step 7: Provide input
+Example:
+    Enter number of productions: 3
+    Enter productions:
+    S=AB
+    A=a
+    B=b
+
+
+Step 8: Output will be displayed
+
+
+===============================================================
+
+
+NOTE:
+- '#' represents epsilon
+- '$' represents end marker
+- Only uppercase letters are treated as non-terminals
+- Works best for simple grammar (lab exams)
+
+
+===============================================================
+*/

@@ -1,0 +1,99 @@
+﻿%{
+#include<stdio.h>
+int chars=0, words=0, lines=0, tabs=0, numbers=0, spaces=0, sentences=0;
+%}
+
+
+%%
+[0-9]+        { numbers++; chars += yyleng; }
+[a-zA-Z]+     { words++; chars += yyleng; }
+" "           { spaces++; chars++; }
+\t            { tabs++; chars++; }
+\n            { lines++; chars++; }
+[.!?]         { sentences++; chars++; }
+.             { chars++; }
+%%
+
+
+int main()
+{
+    printf("Enter text (Press Ctrl+D to stop input):\n");
+    yylex();
+
+
+    printf("\nCharacters : %d\n", chars);
+    printf("Words : %d\n", words);   // FIXED (semicolon added)
+    printf("Lines : %d\n", lines);
+    printf("Tabs : %d\n", tabs);
+    printf("Numbers : %d\n", numbers);
+    printf("Spaces : %d\n", spaces);
+    printf("Sentences : %d\n", sentences);
+
+
+    return 0;
+}
+
+
+int yywrap()
+{
+    return 1;
+}
+
+
+/*
+===========================
+HOW TO RUN THIS PROGRAM IN UBUNTU (STEP BY STEP)
+===========================
+
+
+1. Install required tools (if not installed):
+   Open terminal and run:
+   sudo apt update
+   sudo apt install flex gcc
+
+
+2. Open any text editor (like gedit, nano, or vim):
+   Example:
+   nano counter.l
+
+
+3. Paste this code into the file and save it.
+   (CTRL + O, Enter, CTRL + X in nano)
+
+
+4. Generate C file using flex:
+   flex counter.l
+
+
+   This will create:
+   lex.yy.c
+
+
+5. Compile the generated file using gcc:
+   gcc lex.yy.c -o counter
+
+
+6. Run the program:
+   ./counter
+
+
+7. Enter input text:
+   Example:
+   Hello world! This is 2024.
+
+
+8. To stop input:
+   Press CTRL + D
+
+
+9. Output will be displayed:
+   Characters, Words, Lines, Tabs, Numbers, Spaces, Sentences
+
+
+===========================
+NOTES:
+===========================
+- Works perfectly in Ubuntu terminal
+- Can be written using any text editor (nano, gedit, vim)
+- Make sure file extension is .l (important for flex)
+*/

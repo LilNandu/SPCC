@@ -1,0 +1,146 @@
+﻿FILE 1 - expr.l 
+
+%{
+#include "y.tab.h"
+#include <stdlib.h>
+#include <stdio.h>
+%}
+
+
+%%
+[0-9]+      { yylval = atoi(yytext); return NUMBER; }
+[ \t]       ; 
+\n          return 0;
+.           return yytext[0];
+%%
+
+
+int yywrap()
+{
+    return 1;
+}
+
+
+void yyerror(char *s)
+{
+    printf("Invalid Expression\n");
+}
+
+
+FILE 2 - expr.y 
+
+
+%{
+#include <stdio.h>
+#include <stdlib.h>
+
+
+int yylex();
+void yyerror(char *s);
+%}
+
+
+%token NUMBER
+
+
+/* Operator precedence */
+%left '+' '-'
+%left '*' '/'
+
+
+%%
+
+
+E : E '+' E
+  | E '-' E
+  | E '*' E
+  | E '/' E
+  | NUMBER
+  ;
+
+
+%%
+
+
+int main()
+{
+    printf("Enter Expression:\n");
+    yyparse();
+    printf("Valid Expression\n");
+    return 0;
+}
+
+
+void yyerror(char *s)
+{
+    printf("Invalid Expression\n");
+}
+ 
+
+
+
+
+/*
+===========================
+STEPS TO EXECUTE IN UBUNTU
+===========================
+
+
+1. Install required tools:
+   sudo apt update
+   sudo apt install flex bison gcc
+
+
+2. Create two files:
+   expr.l   (Lex file)
+   expr.y   (Yacc file)
+
+
+3. Generate parser file using yacc (bison):
+   yacc -d expr.y
+   OR
+   bison -d expr.y
+
+
+   This creates:
+   y.tab.c and y.tab.h
+
+
+4. Generate lexer file:
+   flex expr.l
+
+
+   This creates:
+   lex.yy.c
+
+
+5. Compile both files:
+   gcc lex.yy.c y.tab.c -o expr
+
+
+6. Run the program:
+   ./expr
+
+
+7. Enter expression:
+   Example:
+   2+3*4
+
+
+8. Output:
+   Valid Expression
+
+
+   If wrong input:
+   Invalid Expression
+
+
+===========================
+NOTES:
+===========================
+- Works in Ubuntu terminal
+- Use nano / gedit / vim to create files
+- File extensions must be:
+  .l for Lex
+  .y for Yacc
+*/

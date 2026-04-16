@@ -1,0 +1,145 @@
+﻿import re
+
+
+# Sample Opcode Table (for simplicity)
+OPCODE_TABLE = {
+    "LOAD": "01",
+    "MOV": "02",
+    "ADD": "03",
+    "SUB": "04",
+    "MUL": "05",
+    "DIV": "06",
+    "JMP": "07",
+    "HALT": "FF"
+}
+
+
+# Helper function to parse a line of assembly code
+def parse_line(line):
+    # Remove comments
+    line = line.split(';')[0].strip()
+    if not line:
+        return None, None, None
+
+
+    # Pattern to identify labels
+    label_match = re.match(r"^[A-Za-z][A-Za-z0-9_]*:", line)
+    label = label_match.group(0)[:-1] if label_match else None
+
+
+    if label:
+        line = line[len(label) + 1:].strip()
+
+
+    # Ensure we split into at most two parts (opcode and operand)
+    parts = line.split(maxsplit=1)
+    opcode = parts[0] if parts else None
+    operand = parts[1] if len(parts) > 1 else None
+
+
+    return label, opcode, operand
+
+
+# Pass 1: Build the Symbol Table
+def pass_1(assembly_code):
+    symbol_table = {}
+    location_counter = 0
+    address_table = []
+    instructions = []
+
+
+    for line in assembly_code:
+        label, opcode, operand = parse_line(line)
+
+
+        if label:
+            if label in symbol_table:
+                print(f"Error: Label '{label}' already defined.")
+                return None, None, None
+            symbol_table[label] = location_counter
+
+
+        if opcode:
+            instructions.append((opcode, operand))
+            address_table.append(location_counter)
+            location_counter += 1
+
+
+    return symbol_table, address_table, instructions
+
+
+# Pass 2: Generate Machine Code
+def pass_2(symbol_table, instructions):
+    machine_code = []
+
+
+    for opcode, operand in instructions:
+        if opcode not in OPCODE_TABLE:
+            print(f"Error: Undefined opcode '{opcode}'")
+            return None
+
+
+        # Convert opcode to its machine code equivalent
+        opcode_bin = OPCODE_TABLE[opcode]
+
+
+        if operand:
+            # Remove commas if present (e.g., "R1, R2")
+            clean_operand = operand.replace(",", "")
+
+
+            # Check if operand is a label
+            if clean_operand in symbol_table:
+                operand_value = str(symbol_table[clean_operand])
+            else:
+                operand_value = clean_operand  # Keep as-is (immediate value or register)
+        else:
+            operand_value = "00"  # Default for instructions like HALT
+
+
+        # Construct final machine code instruction
+        machine_code.append(f"{opcode_bin} {operand_value}")
+
+
+    return machine_code
+
+
+# Main Assembly Code Input
+assembly_code = [
+    "START: LOAD 100",
+    "MOV R1, R2",
+    "ADD R1, 50",
+    "HALT",
+    "; This is a comment",
+    "LOOP: JMP START"
+]
+
+
+# Run Pass 1
+symbol_table, address_table, instructions = pass_1(assembly_code)
+
+
+if symbol_table is not None and instructions:
+    print("\nSymbol Table (Pass 1):")
+    print(symbol_table)
+
+
+    print("\nGenerated Instructions (Pass 1):")
+    print(instructions)
+
+
+    # Run Pass 2
+    machine_code = pass_2(symbol_table, instructions)
+
+
+    if machine_code:
+        print("\nFinal Machine Code (Pass 2):")
+        for i, mc in enumerate(machine_code):
+            print(f"{i}: {mc}")
+
+
+# Output instructions:
+# Save this file as 2pass.py
+# open terminal and type:
+# nano 2pass.py
+# python3 2pass.py
