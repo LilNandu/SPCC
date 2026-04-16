@@ -58,5 +58,7 @@ print(address_table)
 print("\nInstructions (without labels):")
 print(instructions)
 #Output
-#nano assembler.py
-#python3 assembler.py
+#Save this file as 1pass.py
+#open terminal and type
+#nano 1pass.py
+#python3 1pass.py
