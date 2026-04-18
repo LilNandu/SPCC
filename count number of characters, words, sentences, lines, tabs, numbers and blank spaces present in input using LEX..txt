@@ -90,6 +90,11 @@ HOW TO RUN THIS PROGRAM IN UBUNTU (STEP BY STEP)
    Characters, Words, Lines, Tabs, Numbers, Spaces, Sentences
 
 
+ONLY for PANDU
+lex count.l
+gcc lex.yy.c -o count
+./count
+
 ===========================
 NOTES:
 ===========================
