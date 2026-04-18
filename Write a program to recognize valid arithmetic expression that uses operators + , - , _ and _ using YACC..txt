@@ -21,10 +21,6 @@ int yywrap()
 }
 
 
-void yyerror(char *s)
-{
-    printf("Invalid Expression\n");
-}
 
 
 FILE 2 - expr.y 
@@ -91,7 +87,7 @@ STEPS TO EXECUTE IN UBUNTU
    sudo apt install flex bison gcc
 
 
-2. Create two files:
+2. Create two files (can be done using nano fir uppar wala code paste kardiyo alag alag files mein):
    expr.l   (Lex file)
    expr.y   (Yacc file)
 
@@ -120,10 +116,7 @@ STEPS TO EXECUTE IN UBUNTU
 
 6. Run the program:
    ./expr
-
-
-7. Enter expression:
-   Example:
+ 
    2+3*4
 
 
