@@ -127,6 +127,11 @@ STEPS TO EXECUTE IN UBUNTU
    If wrong input:
    Invalid Expression
 
+ONLY FOR GANDU
+yacc -d expr.y
+lex expr.l
+gcc lex.yy.c y.tab.c -o expr
+./expr
 
 ===========================
 NOTES:
