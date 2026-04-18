@@ -1,0 +1,109 @@
+#include<stdio.h>
+#include<ctype.h>
+#include<string.h>
+
+int n;
+char prod[10][10];
+char first[10][10];
+
+// Add element to set (avoid duplicates)
+void add(char *set, char val) {
+    if(strchr(set, val) == NULL) {
+        int len = strlen(set);
+        set[len] = val;
+        set[len+1] = '\0';
+    }
+}
+
+// FIRST function
+void findFirst(char c, int index) {
+    if(!isupper(c)) {
+        add(first[index], c);
+        return;
+    }
+
+    for(int i=0; i<n; i++) {
+        if(prod[i][0] == c) {
+            if(prod[i][2] == '#') {
+                add(first[index], '#');
+            } else {
+                findFirst(prod[i][2], index);
+            }
+        }
+    }
+}
+
+int main() {
+    printf("Enter number of productions: ");
+    scanf("%d", &n);
+
+    printf("Enter productions (Example: S=AB):\n");
+    for(int i=0; i<n; i++) {
+        scanf("%s", prod[i]);
+    }
+
+    // Initialize FIRST sets
+    for(int i=0; i<10; i++) {
+        first[i][0] = '\0';
+    }
+
+    // FIRST calculation
+    for(int i=0; i<n; i++) {
+        findFirst(prod[i][0], prod[i][0]-'A');
+    }
+
+    // Display FIRST sets
+    printf("\nFIRST Sets:\n");
+    for(int i=0; i<n; i++) {
+        char c = prod[i][0];
+        printf("FIRST(%c) = { ", c);
+
+        for(int j=0; first[c-'A'][j] != '\0'; j++)
+            printf("%c ", first[c-'A'][j]);
+
+        printf("}\n");
+    }
+
+    return 0;
+}
+
+/*
+================= HOW TO RUN THIS CODE IN UBUNTU =================
+
+Step 1: Open Terminal
+
+Step 2: Open any text editor (nano / gedit / vim)
+Example using nano:
+    nano first.c
+
+Step 3: Paste this code into the file
+
+Step 4: Save and exit
+    Press CTRL + O → Enter
+    Press CTRL + X
+
+Step 5: Compile the program using GCC
+    gcc first.c -o first
+
+Step 6: Run the program
+    ./first
+
+Step 7: Provide input
+Example:
+    Enter number of productions: 3
+    Enter productions:
+    S=AB
+    A=a
+    B=b
+
+Step 8: Output will be displayed
+
+===============================================================
+
+NOTE:
+- '#' represents epsilon
+- Only uppercase letters are treated as non-terminals
+- Works best for simple grammar (lab exams)
+
+===============================================================
+*/
